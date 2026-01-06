@@ -1,3 +1,4 @@
+from __future__ import annotations
 import logging
 
 from homeassistant.components.select import SelectEntity
@@ -92,9 +93,7 @@ class RekuperatorTrybSelect(SelectEntity):
                 _LOGGER.error(f"Unknown option selected: {option}")
                 return
 
-            success = await self.coordinator.controller.write_register(
-                self._address, code
-            )
+            success = await self.coordinator.controller.write_register(self._address, code)
             if success:
                 await self.coordinator.async_request_refresh()
 
@@ -106,10 +105,7 @@ class RekuperatorTrybSelect(SelectEntity):
         pass
 
     async def async_added_to_hass(self):
-        self.async_on_remove(
-            self.coordinator.async_add_listener(self.async_write_ha_state)
-        )
-
+        self.async_on_remove(self.coordinator.async_add_listener(self.async_write_ha_state))
 
 class RekuperatorSezonSelect(SelectEntity):
     """Representation of Rekuperator Sezon Select."""
@@ -151,9 +147,7 @@ class RekuperatorSezonSelect(SelectEntity):
                 _LOGGER.error(f"Unknown option selected: {option}")
                 return
 
-            success = await self.coordinator.controller.write_register(
-                self._address, code
-            )
+            success = await self.coordinator.controller.write_register(self._address, code)
             if success:
                 await self.coordinator.async_request_refresh()
 
@@ -165,10 +159,7 @@ class RekuperatorSezonSelect(SelectEntity):
         pass
 
     async def async_added_to_hass(self):
-        self.async_on_remove(
-            self.coordinator.async_add_listener(self.async_write_ha_state)
-        )
-
+        self.async_on_remove(self.coordinator.async_add_listener(self.async_write_ha_state))
 
 class RekuperatorErvTrybSelect(SelectEntity):
     """Representation of ERV mode Select."""
