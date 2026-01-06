@@ -1,4 +1,3 @@
-from __future__ import annotations
 import logging
 
 from homeassistant.components.binary_sensor import BinarySensorEntity
@@ -13,26 +12,115 @@ _LOGGER = logging.getLogger(__name__)
 
 BINARY_SENSORS = [
     # Odczyt z COILS
-    {"name": "Rekuperator Silownik bypassu", "address": 9, "input_type": "coil", "icon_on": "mdi:valve-open", "icon_off": "mdi:valve-closed"},
-    {"name": "Rekuperator Potwierdzenie pracy", "address": 11, "input_type": "coil", "icon_on": "mdi:check-circle", "icon_off": "mdi:circle-outline"},
+    {
+        "name": "Rekuperator Silownik bypassu",
+        "address": 9,
+        "input_type": "coil",
+        "icon_on": "mdi:valve-open",
+        "icon_off": "mdi:valve-closed",
+    },
+    {
+        "name": "Rekuperator Potwierdzenie pracy",
+        "address": 11,
+        "input_type": "coil",
+        "icon_on": "mdi:check-circle",
+        "icon_off": "mdi:circle-outline",
+    },
 
     # Odczyt z HOLDING REGISTERS
-    {"name": "Rekuperator Alarm", "address": 8192, "input_type": "holding", "device_class": "problem"},
-    {"name": "Rekuperator Awaria CF Nawiewu", "address": 8330, "input_type": "holding", "device_class": "problem"},
-    {"name": "Rekuperator Awaria CF Wywiewu", "address": 8331, "input_type": "holding", "device_class": "problem"},
-    {"name": "Rekuperator Awaria Wentylatora Nawiewu", "address": 8222, "input_type": "holding", "device_class": "problem"},
-    {"name": "Rekuperator Awaria Wentylatora Wywiewu", "address": 8223, "input_type": "holding", "device_class": "problem"},
+    {
+        "name": "Rekuperator Alarm",
+        "address": 8192,
+        "input_type": "holding",
+        "device_class": "problem",
+    },
+    {
+        "name": "Rekuperator Awaria CF Nawiewu",
+        "address": 8330,
+        "input_type": "holding",
+        "device_class": "problem",
+    },
+    {
+        "name": "Rekuperator Awaria CF Wywiewu",
+        "address": 8331,
+        "input_type": "holding",
+        "device_class": "problem",
+    },
+    {
+        "name": "Rekuperator Awaria Wentylatora Nawiewu",
+        "address": 8222,
+        "input_type": "holding",
+        "device_class": "problem",
+    },
+    {
+        "name": "Rekuperator Awaria Wentylatora Wywiewu",
+        "address": 8223,
+        "input_type": "holding",
+        "device_class": "problem",
+    },
 
     # BYPASS: tutaj wartość 0 oznacza "ON" (otwarty) – odwracamy logikę przez on_value=0
-    {"name": "Rekuperator Bypass", "address": 4320, "input_type": "holding", "on_value": 0, "icon_on": "mdi:valve-open", "icon_off": "mdi:valve-closed"},
+    {
+        "name": "Rekuperator Bypass",
+        "address": 4320,
+        "input_type": "holding",
+        "on_value": 0,
+        "icon_on": "mdi:valve-open",
+        "icon_off": "mdi:valve-closed",
+    },
 
-    {"name": "Rekuperator Error", "address": 8193, "input_type": "holding", "device_class": "problem"},
-    {"name": "Rekuperator fpx flaga", "address": 4192, "input_type": "holding", "icon_on": "mdi:flag", "icon_off": "mdi:flag-outline"},
-    {"name": "Rekuperator FPX tryb", "address": 4198, "input_type": "holding", "icon_on": "mdi:fan-alert", "icon_off": "mdi:fan"},
-    {"name": "Rekuperator FPX zabezpieczenie termiczne", "address": 8208, "input_type": "holding", "device_class": "safety"},
-    {"name": "Rekuperator lato zima", "address": 4209, "input_type": "holding", "icon_on": "mdi:sun-thermometer", "icon_off": "mdi:snowflake"},
-    {"name": "Rekuperator Wymiana Filtrów", "address": 8444, "input_type": "holding", "icon_on": "mdi:air-filter", "icon_off": "mdi:fan-alert"},
+    {
+        "name": "Rekuperator Error",
+        "address": 8193,
+        "input_type": "holding",
+        "device_class": "problem",
+    },
+    {
+        "name": "Rekuperator fpx flaga",
+        "address": 4192,
+        "input_type": "holding",
+        "icon_on": "mdi:flag",
+        "icon_off": "mdi:flag-outline",
+    },
+    {
+        "name": "Rekuperator FPX tryb",
+        "address": 4198,
+        "input_type": "holding",
+        "icon_on": "mdi:fan-alert",
+        "icon_off": "mdi:fan",
+    },
+    {
+        "name": "Rekuperator FPX zabezpieczenie termiczne",
+        "address": 8208,
+        "input_type": "holding",
+        "device_class": "safety",
+    },
+    {
+        "name": "Rekuperator lato zima",
+        "address": 4209,
+        "input_type": "holding",
+        "icon_on": "mdi:sun-thermometer",
+        "icon_off": "mdi:snowflake",
+    },
+    {
+        "name": "Rekuperator Wymiana Filtrów",
+        "address": 8444,
+        "input_type": "holding",
+        "icon_on": "mdi:air-filter",
+        "icon_off": "mdi:fan-alert",
+    },
+
+    # NOWY SENSOR: Status ERV (0 - nieaktywna, 1 - aktywna)
+    {
+        "name": "Rekuperator Status ERV",
+        "address": 4704,
+        "input_type": "holding",
+        "on_value": 1,
+        "icon_on": "mdi:heat-pump",
+        "icon_off": "mdi:heat-pump-outline",
+    },
 ]
+
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -104,13 +192,15 @@ class ModbusBinarySensor(BinarySensorEntity):
             except Exception:
                 return bool(val)
 
-        elif self._input_type == "holding":
+        if self._input_type == "holding":
             value = self.coordinator.safe_data.holding.get(self._address)
             if value is None:
                 return None
             return value == self._on_value
 
-        _LOGGER.error("Unknown input_type '%s' for %s", self._input_type, self._attr_name)
+        _LOGGER.error(
+            "Unknown input_type '%s' for %s", self._input_type, self._attr_name
+        )
         return None
 
     @property
@@ -126,4 +216,6 @@ class ModbusBinarySensor(BinarySensorEntity):
 
     async def async_added_to_hass(self):
         """Register entity with coordinator updates."""
-        self.async_on_remove(self.coordinator.async_add_listener(self.async_write_ha_state))
+        self.async_on_remove(
+            self.coordinator.async_add_listener(self.async_write_ha_state)
+        )
